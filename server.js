@@ -4,8 +4,6 @@ const mongoose = require("mongoose");
 
 const PORT = process.env.PORT || 3000;
 
-const db = require("./models");
-
 const app = express();
 
 app.use(logger("dev"));
@@ -18,8 +16,8 @@ app.use(express.static("public"));
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/populate", { useNewUrlParser: true });
 
 db.Workout.create({ name: "Workout" })
-  .then(dbLibrary => {
-    console.log(dbLibrary);
+  .then(dbWorkout => {
+    console.log(dbWorkout);
   })
   .catch(({message}) => {
     console.log(message);
@@ -34,4 +32,21 @@ app.post("/submit", ({body}, res) => {
     .catch(err => {
       res.json(err);
     });
+});
+
+
+const WorkoutSchema = new Schema({
+  // schema information here about fields
+    },
+    {
+      toJSON: {
+        // include any virtual properties when data is requested
+        virtuals: true
+      }
+    }
+
+)};
+
+WorkoutSchema.virtual('totalDuration').get(function() {
+  return this.exercises.reduce((total, { duration }) => total + duration, 0);
 });
