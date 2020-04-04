@@ -24,17 +24,22 @@ db.Workout.create({ name: "Workout" })
     console.log(message);
   });
 
-app.post("/workout", ({body}, res) => {
-  db.Workout.create(body)
-    .then(({_id}) => db.Workout.findOneAndUpdate({}, { $push: { workouts: _id } }, { new: true }))
-    .then(dbWorkout => {
-      res.json(dbWorkout);
-    })
-    .catch(err => {
-      res.json(err);
-    });
+  app.post("/workout", ({body}, res) => {
+    db.Workout.create(body)
+      .then(({_id}) => db.Workout.findOneAndUpdate({}, { $push: { workouts: _id } }, { new: true }))
+      .then(dbWorkout => {
+        res.json(dbWorkout);
+      })
+      .catch(err => {
+        res.json(err);
+      });
+  });
+
+db.WorkoutSchema.virtual('totalDuration').get(function() {
+  return this.exercises.reduce((total, { duration }) => total + duration, 0);
 });
 
-WorkoutSchema.virtual('totalDuration').get(function() {
-  return this.exercises.reduce((total, { duration }) => total + duration, 0);
+
+app.listen(PORT, () => {
+  console.log(`App running on port ${PORT}!`);
 });
